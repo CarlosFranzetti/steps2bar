@@ -1,1 +1,4 @@
 project_id = "afqkzntpejdcbuwomeme"
+
+[functions.fetch-nearby-bars]
+verify_jwt = false
