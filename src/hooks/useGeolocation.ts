@@ -53,10 +53,19 @@ export const useGeolocation = () => {
     };
     localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(data));
   }, []);
-
   const clearSavedLocation = useCallback(() => {
     localStorage.removeItem(LOCATION_STORAGE_KEY);
   }, []);
+
+  const setManualLocation = useCallback((latitude: number, longitude: number) => {
+    setState({
+      latitude,
+      longitude,
+      error: null,
+      isLoading: false,
+    });
+    saveLocation(latitude, longitude);
+  }, [saveLocation]);
 
   const getLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -108,5 +117,5 @@ export const useGeolocation = () => {
     );
   }, [saveLocation]);
 
-  return { ...state, getLocation, clearSavedLocation };
+  return { ...state, getLocation, clearSavedLocation, setManualLocation };
 };
