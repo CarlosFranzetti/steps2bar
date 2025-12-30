@@ -58,16 +58,41 @@ serve(async (req) => {
   }
 
   try {
-    const { latitude, longitude, radius = 2000 } = await req.json();
+    const body = await req.json();
+    
+    // Type validation
+    const latitude = typeof body.latitude === 'number' ? body.latitude : NaN;
+    const longitude = typeof body.longitude === 'number' ? body.longitude : NaN;
+    const radius = typeof body.radius === 'number' ? body.radius : 2000;
 
-    if (!latitude || !longitude) {
+    // Validate latitude and longitude are valid numbers
+    if (isNaN(latitude) || isNaN(longitude)) {
       return new Response(
-        JSON.stringify({ error: 'Latitude and longitude are required' }),
+        JSON.stringify({ error: 'Latitude and longitude must be valid numbers' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Fetching bars near ${latitude}, ${longitude} within ${radius}m`);
+    // Validate latitude range (-90 to 90)
+    if (latitude < -90 || latitude > 90) {
+      return new Response(
+        JSON.stringify({ error: 'Latitude must be between -90 and 90' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate longitude range (-180 to 180)
+    if (longitude < -180 || longitude > 180) {
+      return new Response(
+        JSON.stringify({ error: 'Longitude must be between -180 and 180' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate radius (100m to 10km)
+    const validatedRadius = isNaN(radius) || radius < 100 || radius > 10000 ? 2000 : radius;
+
+    console.log(`Fetching bars near ${latitude}, ${longitude} within ${validatedRadius}m`);
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -81,14 +106,14 @@ serve(async (req) => {
     const overpassQuery = `
       [out:json][timeout:15];
       (
-        node["amenity"="bar"](around:${radius},${latitude},${longitude});
-        node["amenity"="pub"](around:${radius},${latitude},${longitude});
-        node["amenity"="nightclub"](around:${radius},${latitude},${longitude});
-        node["amenity"="biergarten"](around:${radius},${latitude},${longitude});
-        way["amenity"="bar"](around:${radius},${latitude},${longitude});
-        way["amenity"="pub"](around:${radius},${latitude},${longitude});
-        way["amenity"="nightclub"](around:${radius},${latitude},${longitude});
-        way["amenity"="biergarten"](around:${radius},${latitude},${longitude});
+        node["amenity"="bar"](around:${validatedRadius},${latitude},${longitude});
+        node["amenity"="pub"](around:${validatedRadius},${latitude},${longitude});
+        node["amenity"="nightclub"](around:${validatedRadius},${latitude},${longitude});
+        node["amenity"="biergarten"](around:${validatedRadius},${latitude},${longitude});
+        way["amenity"="bar"](around:${validatedRadius},${latitude},${longitude});
+        way["amenity"="pub"](around:${validatedRadius},${latitude},${longitude});
+        way["amenity"="nightclub"](around:${validatedRadius},${latitude},${longitude});
+        way["amenity"="biergarten"](around:${validatedRadius},${latitude},${longitude});
       );
       out center;
     `;
@@ -180,8 +205,8 @@ serve(async (req) => {
       fromCache = true;
 
       // Fallback: Query cached bars from database within approximate bounding box
-      const latDelta = radius / 111000; // ~111km per degree latitude
-      const lonDelta = radius / (111000 * Math.cos(latitude * Math.PI / 180));
+      const latDelta = validatedRadius / 111000; // ~111km per degree latitude
+      const lonDelta = validatedRadius / (111000 * Math.cos(latitude * Math.PI / 180));
 
       const { data: cachedBars, error: dbError } = await supabase
         .from('bars')
@@ -202,7 +227,7 @@ serve(async (req) => {
       bars = (cachedBars || []).map((bar) => ({
         ...bar,
         distance: calculateDistance(latitude, longitude, bar.latitude, bar.longitude),
-      })).filter((bar) => bar.distance <= radius);
+      })).filter((bar) => bar.distance <= validatedRadius);
     }
 
     // Sort by distance and return
@@ -215,9 +240,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error fetching bars:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
+    // Return generic error to clients - keep detailed logging server-side only
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: 'Unable to fetch nearby bars. Please try again later.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
