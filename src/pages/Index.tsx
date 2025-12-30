@@ -75,7 +75,7 @@ const Index = () => {
   }, [error]);
 
   return (
-    <main className="min-h-screen bg-background animate-fade-in">
+    <main className="min-h-screen bg-background">
       {/* Background gradient - dark brown fade */}
       <div className="fixed inset-0 bg-gradient-to-b from-[hsl(20,30%,8%)] via-background to-background pointer-events-none" />
       
@@ -83,7 +83,7 @@ const Index = () => {
         {/* Header */}
         <header className="text-center mb-8">
           <div 
-            className="inline-flex items-center justify-center gap-2.5 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2.5 cursor-pointer animate-fade-in"
             onClick={() => setShowTagline(true)}
           >
             <Beer className="h-8 w-8 text-primary animate-float" />
@@ -91,8 +91,11 @@ const Index = () => {
               Steps<span className="text-primary">2</span>Bar
             </h1>
           </div>
-          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-16 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}>
-            <p className="text-base text-muted-foreground max-w-sm mx-auto leading-relaxed">
+          <div 
+            className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-16 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
+            style={{ animationDelay: '100ms' }}
+          >
+            <p className="text-base text-muted-foreground max-w-sm mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '150ms' }}>
               Know exactly how many footsteps to your next drink.
             </p>
           </div>
@@ -101,7 +104,7 @@ const Index = () => {
         {/* Main content */}
         <div className="max-w-lg mx-auto">
           {/* Location controls */}
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
             <LocationButton
               onClick={() => {
                 setShowTagline(false);
@@ -177,7 +180,7 @@ const Index = () => {
 
           {/* Empty state */}
           {!showBars && !isLoading && (
-            <div className="text-center py-16">
+            <div className="text-center py-16 animate-fade-in" style={{ animationDelay: '300ms' }}>
               <div className="glass-card rounded-2xl p-8 max-w-sm mx-auto">
                 <Beer className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
