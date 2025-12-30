@@ -1,44 +1,52 @@
 import { useState, useEffect } from "react";
 import { Beer, AlertCircle } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { generateMockBars, Bar } from "@/data/mockBars";
+import { useFetchBars } from "@/hooks/useFetchBars";
 import BarCard from "@/components/BarCard";
 import FootstepCounter from "@/components/FootstepCounter";
 import LocationButton from "@/components/LocationButton";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
-  const { latitude, longitude, error, isLoading, getLocation } = useGeolocation();
-  const [bars, setBars] = useState<Bar[]>([]);
+  const { latitude, longitude, error: geoError, isLoading: geoLoading, getLocation } = useGeolocation();
+  const { bars, isLoading: barsLoading, error: barsError, fetchBars } = useFetchBars();
   const [showBars, setShowBars] = useState(false);
   const { toast } = useToast();
 
   const hasLocation = latitude !== null && longitude !== null;
   const nearestBar = bars[0];
+  const isLoading = geoLoading || barsLoading;
+  const error = geoError || barsError;
 
   useEffect(() => {
-    if (hasLocation) {
-      // Simulate fetching nearby bars
-      const mockBars = generateMockBars();
-      setBars(mockBars);
-      setShowBars(true);
-      
-      toast({
-        title: "Location found!",
-        description: `Found ${mockBars.length} bars near you.`,
+    if (hasLocation && latitude && longitude) {
+      fetchBars(latitude, longitude).then((fetchedBars) => {
+        if (fetchedBars.length > 0) {
+          setShowBars(true);
+          toast({
+            title: "Location found!",
+            description: `Found ${fetchedBars.length} bars near you from OpenStreetMap.`,
+          });
+        } else {
+          toast({
+            title: "No bars found",
+            description: "No bars found nearby. Try a different location.",
+            variant: "destructive",
+          });
+        }
       });
     }
-  }, [latitude, longitude, hasLocation, toast]);
+  }, [latitude, longitude, hasLocation]);
 
   useEffect(() => {
     if (error) {
       toast({
-        title: "Location Error",
+        title: "Error",
         description: error,
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+  }, [error]);
 
   return (
     <main className="min-h-screen bg-background">
@@ -97,7 +105,6 @@ const Index = () => {
                   key={bar.id}
                   name={bar.name}
                   distance={bar.distance}
-                  rating={bar.rating}
                   type={bar.type}
                   isNearest={index === 0}
                   delay={index * 100}

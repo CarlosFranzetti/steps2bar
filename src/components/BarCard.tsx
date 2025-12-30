@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface BarCardProps {
   name: string;
   distance: number; // in meters
-  rating: number;
+  rating?: number;
   type: string;
   isNearest?: boolean;
   delay?: number;
@@ -47,10 +47,12 @@ const BarCard = ({ name, distance, rating, type, isNearest = false, delay = 0 }:
             <span>{type}</span>
           </div>
         </div>
-        <div className="flex items-center gap-1 bg-secondary/50 px-2 py-1 rounded-lg">
-          <Star className="h-4 w-4 text-primary fill-primary" />
-          <span className="text-sm font-medium">{rating}</span>
-        </div>
+        {rating && (
+          <div className="flex items-center gap-1 bg-secondary/50 px-2 py-1 rounded-lg">
+            <Star className="h-4 w-4 text-primary fill-primary" />
+            <span className="text-sm font-medium">{rating}</span>
+          </div>
+        )}
       </div>
 
       <div className={cn(
