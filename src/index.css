@@ -136,6 +136,18 @@
     animation: count-up 0.5s ease-out forwards;
   }
 
+  .animate-bounce-subtle {
+    animation: bounce-subtle 1s ease-in-out infinite;
+  }
+
+  .animate-collapse {
+    animation: collapse 0.3s ease-out forwards;
+  }
+
+  .animate-expand {
+    animation: expand 0.3s ease-out forwards;
+  }
+
   @keyframes pulse-glow {
     0%, 100% {
       box-shadow: 0 0 20px hsl(38 92% 50% / 0.3);
@@ -162,6 +174,41 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  @keyframes collapse {
+    from {
+      opacity: 1;
+      max-height: 100px;
+      margin-bottom: 1rem;
+    }
+    to {
+      opacity: 0;
+      max-height: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  @keyframes expand {
+    from {
+      opacity: 0;
+      max-height: 0;
+      margin-bottom: 0;
+    }
+    to {
+      opacity: 1;
+      max-height: 100px;
+      margin-bottom: 1rem;
     }
   }
 }

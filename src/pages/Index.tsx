@@ -9,7 +9,7 @@ import LocationInput from "@/components/LocationInput";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-const BARS_PER_PAGE = 20;
+const BARS_PER_PAGE = 10;
 
 const Index = () => {
   const { latitude, longitude, error: geoError, isLoading: geoLoading, getLocation, setManualLocation } = useGeolocation();
@@ -79,15 +79,15 @@ const Index = () => {
   }, [error]);
 
   return (
-    <main className="min-h-screen bg-background">
-      {/* Background gradient effect */}
-      <div className="fixed inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+    <main className="min-h-screen bg-background animate-fade-in">
+      {/* Background gradient - dark brown fade */}
+      <div className="fixed inset-0 bg-gradient-to-b from-[hsl(20,30%,8%)] via-background to-background pointer-events-none" />
       
       <div className="container relative z-10 py-12 px-4">
         {/* Header */}
-        <header className={`text-center ${showTagline ? 'mb-12' : 'mb-8'}`}>
+        <header className="text-center">
           <div 
-            className="inline-flex items-center justify-center gap-3 mb-4 cursor-pointer"
+            className="inline-flex items-center justify-center gap-3 mb-3 cursor-pointer"
             onClick={() => setShowTagline(true)}
           >
             <Beer className="h-10 w-10 text-primary animate-float" />
@@ -95,11 +95,11 @@ const Index = () => {
               Steps<span className="text-primary">2</span>Bar
             </h1>
           </div>
-          {showTagline && (
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-20 opacity-100 mb-6' : 'max-h-0 opacity-0 mb-0'}`}>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
               Because knowing the exact number of footsteps to your next drink is essential information.
             </p>
-          )}
+          </div>
         </header>
 
         {/* Main content */}
