@@ -92,7 +92,7 @@ const Index = () => {
               Steps<span className="text-primary">2</span>Bar
             </h1>
           </div>
-          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-20 opacity-100 mb-2' : 'max-h-0 opacity-0 mb-0'}`}>
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-20 opacity-100 mb-1' : 'max-h-0 opacity-0 mb-0'}`}>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
               Because knowing the exact number of footsteps to your next drink is essential information.
             </p>
@@ -102,7 +102,7 @@ const Index = () => {
         {/* Main content */}
         <div className="max-w-2xl mx-auto">
           {/* Location controls */}
-          <div className="flex flex-col items-center gap-2 mb-4">
+          <div className="flex flex-col items-center gap-1 mb-4">
             <LocationButton
               onClick={() => {
                 setShowTagline(false);
@@ -112,13 +112,15 @@ const Index = () => {
               hasLocation={hasLocation}
             />
             
-            <LocationInput
-              onLocationFound={(lat, lng) => {
-                setShowTagline(false);
-                handleManualLocation(lat, lng);
-              }}
-              isLoading={isLoading}
-            />
+            <div className="w-full max-w-md">
+              <LocationInput
+                onLocationFound={(lat, lng) => {
+                  setShowTagline(false);
+                  handleManualLocation(lat, lng);
+                }}
+                isLoading={isLoading}
+              />
+            </div>
           </div>
 
           {/* Error display */}
