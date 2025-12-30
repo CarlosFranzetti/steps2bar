@@ -134,47 +134,44 @@ const BarCard = ({
 
       {/* Quick Info Panel */}
       {showInfo && (
-        <div className="absolute inset-0 bg-card/98 backdrop-blur-sm rounded-2xl p-5 z-10 animate-fade-in">
-          <div className="flex items-start justify-between mb-4">
-            <h4 className="font-display font-bold text-lg text-foreground">{name}</h4>
+        <div className="absolute inset-0 bg-card/98 backdrop-blur-sm rounded-2xl p-4 z-10 animate-fade-in">
+          <div className="flex items-start justify-between mb-3">
+            <h4 className="font-display font-bold text-base text-foreground">{name}</h4>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 -mr-2 -mt-2"
+              className="h-6 w-6 -mr-1 -mt-1"
               onClick={() => setShowInfo(false)}
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </Button>
           </div>
           
-          <div className="space-y-2 text-sm">
+          <div className="space-y-1.5 text-sm">
             {phone && (
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-xs w-16">Phone</span>
-                <a href={`tel:${phone}`} className="text-primary hover:underline">{phone}</a>
+                <span className="text-muted-foreground text-xs w-14">Phone</span>
+                <a href={`tel:${phone}`} className="text-primary hover:underline text-sm">{phone}</a>
               </div>
             )}
             
             {address && (
               <div className="flex items-start gap-2">
-                <span className="text-muted-foreground text-xs w-16">Address</span>
-                <span className="text-foreground flex-1">{address}</span>
+                <span className="text-muted-foreground text-xs w-14">Address</span>
+                <span className="text-foreground flex-1 text-sm">{address}</span>
               </div>
             )}
             
             {openingHours && (
               <div className="flex items-start gap-2">
-                <span className="text-muted-foreground text-xs w-16">Hours</span>
-                <span className="text-foreground flex-1">{openingHours}</span>
+                <span className="text-muted-foreground text-xs w-14">Hours</span>
+                <span className="text-foreground flex-1 text-sm">{openingHours}</span>
               </div>
             )}
             
-            <div className="pt-3">
-              <Button onClick={openInMaps} variant="default" size="sm" className="w-full">
-                <MapPin className="h-4 w-4 mr-2" />
-                Open in Maps
-              </Button>
-            </div>
+            {!phone && !address && !openingHours && (
+              <p className="text-muted-foreground text-sm">No additional info available</p>
+            )}
           </div>
         </div>
       )}
