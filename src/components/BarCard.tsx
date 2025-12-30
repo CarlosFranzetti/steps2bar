@@ -76,15 +76,15 @@ const BarCard = ({
         "rounded-xl p-3 mb-2",
         isNearest ? "bg-primary/10" : "bg-secondary/30"
       )}>
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-2 -ml-2">
           <Footprints className={cn(
-            "h-6 w-6",
+            "h-5 w-5 flex-shrink-0",
             isNearest ? "text-primary" : "text-muted-foreground"
           )} />
           <div className="text-center">
             <p className={cn(
               "font-display font-bold",
-              isNearest ? "text-3xl text-primary neon-text" : "text-2xl text-foreground"
+              isNearest ? "text-2xl text-primary neon-text" : "text-xl text-foreground"
             )}>
               {footsteps.toLocaleString()}
             </p>
