@@ -156,10 +156,6 @@ const Index = () => {
                   type={bar.type}
                   latitude={bar.latitude}
                   longitude={bar.longitude}
-                  address={bar.address}
-                  opening_hours={bar.opening_hours}
-                  website={bar.website}
-                  phone={bar.phone}
                   isNearest={index === 0}
                   delay={index * 50}
                 />
