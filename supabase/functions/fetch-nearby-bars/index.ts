@@ -6,6 +6,69 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+const MAX_REQUESTS_PER_WINDOW = 10; // 10 requests per minute per IP
+
+// In-memory rate limit store (resets on function cold start)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+// Clean up expired entries periodically
+function cleanupRateLimitStore() {
+  const now = Date.now();
+  for (const [ip, data] of rateLimitStore.entries()) {
+    if (now >= data.resetTime) {
+      rateLimitStore.delete(ip);
+    }
+  }
+}
+
+// Check and update rate limit for an IP
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  cleanupRateLimitStore();
+  
+  const existing = rateLimitStore.get(ip);
+  
+  if (!existing || now >= existing.resetTime) {
+    // New window - allow and set count to 1
+    rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1, resetIn: RATE_LIMIT_WINDOW_MS };
+  }
+  
+  if (existing.count >= MAX_REQUESTS_PER_WINDOW) {
+    // Rate limit exceeded
+    return { allowed: false, remaining: 0, resetIn: existing.resetTime - now };
+  }
+  
+  // Increment count
+  existing.count++;
+  return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - existing.count, resetIn: existing.resetTime - now };
+}
+
+// Get client IP from request headers
+function getClientIP(req: Request): string {
+  // Try various headers that might contain the real IP
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    // x-forwarded-for can contain multiple IPs, take the first one
+    return forwardedFor.split(',')[0].trim();
+  }
+  
+  const realIP = req.headers.get('x-real-ip');
+  if (realIP) {
+    return realIP.trim();
+  }
+  
+  const cfConnectingIP = req.headers.get('cf-connecting-ip');
+  if (cfConnectingIP) {
+    return cfConnectingIP.trim();
+  }
+  
+  // Fallback - use a generic identifier
+  return 'unknown';
+}
+
 interface OSMElement {
   type: string;
   id: number;
@@ -57,6 +120,33 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Get client IP and check rate limit
+  const clientIP = getClientIP(req);
+  const rateLimit = checkRateLimit(clientIP);
+  
+  // Add rate limit headers to all responses
+  const rateLimitHeaders = {
+    ...corsHeaders,
+    'X-RateLimit-Limit': MAX_REQUESTS_PER_WINDOW.toString(),
+    'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+    'X-RateLimit-Reset': Math.ceil(rateLimit.resetIn / 1000).toString(),
+  };
+
+  if (!rateLimit.allowed) {
+    console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ error: 'Too many requests. Please try again later.' }),
+      { 
+        status: 429, 
+        headers: { 
+          ...rateLimitHeaders, 
+          'Content-Type': 'application/json',
+          'Retry-After': Math.ceil(rateLimit.resetIn / 1000).toString(),
+        } 
+      }
+    );
+  }
+
   try {
     const body = await req.json();
     
@@ -69,7 +159,7 @@ serve(async (req) => {
     if (isNaN(latitude) || isNaN(longitude)) {
       return new Response(
         JSON.stringify({ error: 'Latitude and longitude must be valid numbers' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...rateLimitHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -77,7 +167,7 @@ serve(async (req) => {
     if (latitude < -90 || latitude > 90) {
       return new Response(
         JSON.stringify({ error: 'Latitude must be between -90 and 90' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...rateLimitHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -85,14 +175,14 @@ serve(async (req) => {
     if (longitude < -180 || longitude > 180) {
       return new Response(
         JSON.stringify({ error: 'Longitude must be between -180 and 180' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...rateLimitHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Validate radius (100m to 10km)
     const validatedRadius = isNaN(radius) || radius < 100 || radius > 10000 ? 2000 : radius;
 
-    console.log(`Fetching bars near ${latitude}, ${longitude} within ${validatedRadius}m`);
+    console.log(`Fetching bars near ${latitude}, ${longitude} within ${validatedRadius}m (IP: ${clientIP})`);
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -235,7 +325,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ bars: sortedBars, count: sortedBars.length, fromCache }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -243,7 +333,7 @@ serve(async (req) => {
     // Return generic error to clients - keep detailed logging server-side only
     return new Response(
       JSON.stringify({ error: 'Unable to fetch nearby bars. Please try again later.' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
