@@ -9,7 +9,7 @@ interface BarCardProps {
   type: string;
   latitude: number;
   longitude: number;
-  phone?: string;
+  address?: string;
   isNearest?: boolean;
   delay?: number;
 }
@@ -21,7 +21,7 @@ const BarCard = ({
   type, 
   latitude, 
   longitude,
-  phone,
+  address,
   isNearest = false, 
   delay = 0 
 }: BarCardProps) => {
@@ -76,10 +76,10 @@ const BarCard = ({
         "rounded-xl p-3 mb-2",
         isNearest ? "bg-primary/10" : "bg-secondary/30"
       )}>
-        <div className="flex items-center justify-center gap-3 -ml-[5%]">
+        <div className="flex items-center justify-center gap-3">
           <Footprints className={cn(
             "h-6 w-6",
-            isNearest ? "text-primary animate-bounce-subtle" : "text-muted-foreground"
+            isNearest ? "text-primary" : "text-muted-foreground"
           )} />
           <div className="text-center">
             <p className={cn(
@@ -94,10 +94,10 @@ const BarCard = ({
       </div>
 
       <div className="flex items-center justify-between">
-        {phone ? (
-          <a href={`tel:${phone}`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            {phone}
-          </a>
+        {address ? (
+          <p className="text-xs text-muted-foreground truncate max-w-[60%]">
+            {address}
+          </p>
         ) : (
           <span />
         )}

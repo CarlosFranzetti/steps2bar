@@ -1,4 +1,4 @@
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LocationButtonProps {
@@ -13,12 +13,12 @@ const LocationButton = ({ onClick, isLoading, hasLocation }: LocationButtonProps
       onClick={onClick}
       variant={hasLocation ? "glass" : "neon"}
       size="lg"
-      className="group justify-center text-sm scale-[0.91]"
+      className="group justify-center text-base scale-[0.91]"
       disabled={isLoading}
     >
       {isLoading ? (
         <>
-          <Loader2 className="h-5 w-5 animate-spin" />
+          <MapPin className="h-5 w-5" />
           <span>Finding you...</span>
         </>
       ) : hasLocation ? (
