@@ -41,13 +41,10 @@ const Index = () => {
     if (hasLocation && latitude && longitude && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       setVisibleCount(BARS_PER_PAGE);
+      setShowTagline(false);
       fetchBars(latitude, longitude).then((fetchedBars: Bar[]) => {
         if (fetchedBars.length > 0) {
           setShowBars(true);
-          toast({
-            title: "Location found!",
-            description: `Found ${fetchedBars.length} bars near you.`,
-          });
         } else {
           toast({
             title: "No bars found",
@@ -156,6 +153,9 @@ const Index = () => {
                   type={bar.type}
                   latitude={bar.latitude}
                   longitude={bar.longitude}
+                  address={bar.address}
+                  opening_hours={bar.opening_hours}
+                  phone={bar.phone}
                   isNearest={index === 0}
                   delay={index * 50}
                 />
