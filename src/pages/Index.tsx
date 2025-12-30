@@ -3,12 +3,12 @@ import { Beer, AlertCircle, ChevronDown } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useFetchBars, Bar } from "@/hooks/useFetchBars";
 import BarCard from "@/components/BarCard";
+import BarCardSkeleton from "@/components/BarCardSkeleton";
 import FootstepCounter from "@/components/FootstepCounter";
 import LocationButton from "@/components/LocationButton";
 import LocationInput from "@/components/LocationInput";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-
 const BARS_PER_PAGE = 7;
 
 const Index = () => {
@@ -102,17 +102,15 @@ const Index = () => {
         {/* Main content */}
         <div className="max-w-2xl mx-auto">
           {/* Location controls */}
-          <div className="space-y-2 mb-4">
-            <div className="text-center">
-              <LocationButton
-                onClick={() => {
-                  setShowTagline(false);
-                  getLocation();
-                }}
-                isLoading={isLoading}
-                hasLocation={hasLocation}
-              />
-            </div>
+          <div className="flex flex-col items-center gap-2 mb-4">
+            <LocationButton
+              onClick={() => {
+                setShowTagline(false);
+                getLocation();
+              }}
+              isLoading={isLoading}
+              hasLocation={hasLocation}
+            />
             
             <LocationInput
               onLocationFound={(lat, lng) => {
@@ -172,6 +170,18 @@ const Index = () => {
                   </Button>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Loading skeleton */}
+          {barsLoading && (
+            <div className="space-y-4 mt-4">
+              <h2 className="font-display text-2xl font-bold text-foreground mb-6">
+                Finding Bars...
+              </h2>
+              {[...Array(3)].map((_, i) => (
+                <BarCardSkeleton key={i} />
+              ))}
             </div>
           )}
 

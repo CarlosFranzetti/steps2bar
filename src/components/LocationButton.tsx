@@ -13,7 +13,7 @@ const LocationButton = ({ onClick, isLoading, hasLocation }: LocationButtonProps
       onClick={onClick}
       variant={hasLocation ? "glass" : "neon"}
       size="lg"
-      className="group justify-center text-sm scale-[0.85]"
+      className="group justify-center text-sm scale-[0.87]"
       disabled={isLoading}
     >
       {isLoading ? (
