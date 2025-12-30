@@ -75,7 +75,7 @@ const Index = () => {
   }, [error]);
 
   return (
-    <main className="min-h-screen bg-background animate-fade-in">
+    <main className="min-h-screen bg-background">
       {/* Background gradient - dark brown fade */}
       <div className="fixed inset-0 bg-gradient-to-b from-[hsl(20,30%,8%)] via-background to-background pointer-events-none" />
       
