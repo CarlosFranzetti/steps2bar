@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Beer, AlertCircle } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useFetchBars } from "@/hooks/useFetchBars";
@@ -12,20 +12,23 @@ const Index = () => {
   const { bars, isLoading: barsLoading, error: barsError, fetchBars } = useFetchBars();
   const [showBars, setShowBars] = useState(false);
   const { toast } = useToast();
+  const hasFetchedRef = useRef(false);
 
   const hasLocation = latitude !== null && longitude !== null;
   const nearestBar = bars[0];
   const isLoading = geoLoading || barsLoading;
   const error = geoError || barsError;
 
+  // Fetch bars when location is available (either saved or fresh)
   useEffect(() => {
-    if (hasLocation && latitude && longitude) {
+    if (hasLocation && latitude && longitude && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
       fetchBars(latitude, longitude).then((fetchedBars) => {
         if (fetchedBars.length > 0) {
           setShowBars(true);
           toast({
             title: "Location found!",
-            description: `Found ${fetchedBars.length} bars near you from OpenStreetMap.`,
+            description: `Found ${fetchedBars.length} bars near you.`,
           });
         } else {
           toast({
@@ -37,6 +40,14 @@ const Index = () => {
       });
     }
   }, [latitude, longitude, hasLocation]);
+
+  // Reset fetch flag when location is cleared
+  useEffect(() => {
+    if (!hasLocation) {
+      hasFetchedRef.current = false;
+      setShowBars(false);
+    }
+  }, [hasLocation]);
 
   useEffect(() => {
     if (error) {
