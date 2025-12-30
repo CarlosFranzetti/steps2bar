@@ -3,13 +3,12 @@ import { Beer, AlertCircle, ChevronDown } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useFetchBars, Bar } from "@/hooks/useFetchBars";
 import BarCard from "@/components/BarCard";
-import BarCardSkeleton from "@/components/BarCardSkeleton";
 import FootstepCounter from "@/components/FootstepCounter";
 import LocationButton from "@/components/LocationButton";
 import LocationInput from "@/components/LocationInput";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-const BARS_PER_PAGE = 7;
+const BARS_PER_PAGE = 5;
 
 const Index = () => {
   const { latitude, longitude, error: geoError, isLoading: geoLoading, getLocation, setManualLocation } = useGeolocation();
@@ -175,17 +174,6 @@ const Index = () => {
             </div>
           )}
 
-          {/* Loading skeleton */}
-          {barsLoading && (
-            <div className="space-y-4 mt-4">
-              <h2 className="font-display text-2xl font-bold text-foreground mb-6">
-                Finding Bars...
-              </h2>
-              {[...Array(3)].map((_, i) => (
-                <BarCardSkeleton key={i} />
-              ))}
-            </div>
-          )}
 
           {/* Empty state */}
           {!showBars && !isLoading && (
