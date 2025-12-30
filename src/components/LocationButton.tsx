@@ -12,8 +12,8 @@ const LocationButton = ({ onClick, isLoading, hasLocation }: LocationButtonProps
     <Button
       onClick={onClick}
       variant={hasLocation ? "glass" : "neon"}
-      size="xl"
-      className="group justify-center"
+      size="lg"
+      className="group justify-center text-sm scale-[0.85]"
       disabled={isLoading}
     >
       {isLoading ? (

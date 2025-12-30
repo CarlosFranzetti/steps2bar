@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Beer, Footprints, Star, MapPin, Info, X } from "lucide-react";
+import { Beer, Footprints, Star, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -10,8 +9,6 @@ interface BarCardProps {
   type: string;
   latitude: number;
   longitude: number;
-  address?: string;
-  opening_hours?: string;
   phone?: string;
   isNearest?: boolean;
   delay?: number;
@@ -24,14 +21,10 @@ const BarCard = ({
   type, 
   latitude, 
   longitude,
-  address,
-  opening_hours,
   phone,
   isNearest = false, 
   delay = 0 
 }: BarCardProps) => {
-  const [showInfo, setShowInfo] = useState(false);
-  
   const footsteps = Math.round(distance / 0.762);
   const walkingMinutes = Math.round(distance / 84);
 
@@ -80,10 +73,10 @@ const BarCard = ({
       </div>
 
       <div className={cn(
-        "rounded-xl p-3 mb-3",
+        "rounded-xl p-3 mb-2",
         isNearest ? "bg-primary/10" : "bg-secondary/30"
       )}>
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-3 -ml-[5%]">
           <Footprints className={cn(
             "h-6 w-6",
             isNearest ? "text-primary animate-bounce-subtle" : "text-muted-foreground"
@@ -100,16 +93,14 @@ const BarCard = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 gap-1 text-xs text-muted-foreground hover:text-foreground"
-          onClick={() => setShowInfo(!showInfo)}
-        >
-          <Info className="h-3 w-3" />
-          <span>info</span>
-        </Button>
+      <div className="flex items-center justify-between">
+        {phone ? (
+          <a href={`tel:${phone}`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            {phone}
+          </a>
+        ) : (
+          <span />
+        )}
         <Button
           variant="ghost"
           size="sm"
@@ -120,50 +111,6 @@ const BarCard = ({
           <span>map</span>
         </Button>
       </div>
-
-      {/* Quick Info Panel */}
-      {showInfo && (
-        <div className="absolute inset-0 bg-card/98 backdrop-blur-sm rounded-2xl p-4 z-10 animate-fade-in">
-          <div className="flex items-start justify-between mb-3">
-            <h4 className="font-display font-bold text-base text-foreground">{name}</h4>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 -mr-1 -mt-1"
-              onClick={() => setShowInfo(false)}
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-          
-          <div className="space-y-1.5 text-sm">
-            {phone && (
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-xs w-14">Phone</span>
-                <a href={`tel:${phone}`} className="text-primary hover:underline text-sm">{phone}</a>
-              </div>
-            )}
-            
-            {address && (
-              <div className="flex items-start gap-2">
-                <span className="text-muted-foreground text-xs w-14">Address</span>
-                <span className="text-foreground flex-1 text-sm">{address}</span>
-              </div>
-            )}
-            
-            {opening_hours && (
-              <div className="flex items-start gap-2">
-                <span className="text-muted-foreground text-xs w-14">Hours</span>
-                <span className="text-foreground flex-1 text-sm">{opening_hours}</span>
-              </div>
-            )}
-            
-            {!phone && !address && !opening_hours && (
-              <p className="text-muted-foreground text-sm">No additional info available</p>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
