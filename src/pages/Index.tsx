@@ -105,7 +105,7 @@ const Index = () => {
         {/* Main content */}
         <div className="max-w-2xl mx-auto">
           {/* Location controls */}
-          <div className="space-y-4 mb-8">
+          <div className="space-y-3 mb-4">
             <div className="text-center">
               <LocationButton
                 onClick={() => {
@@ -128,7 +128,7 @@ const Index = () => {
 
           {/* Error display */}
           {error && (
-            <div className="glass-card rounded-xl p-4 mb-8 flex items-center gap-3 border-destructive/50">
+            <div className="glass-card rounded-xl p-4 mb-4 flex items-center gap-3 border-destructive/50">
               <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
               <p className="text-sm text-muted-foreground">{error}</p>
             </div>
@@ -144,7 +144,7 @@ const Index = () => {
 
           {/* Bar list */}
           {showBars && bars.length > 0 && (
-            <div className="space-y-4 mt-8">
+            <div className="space-y-4 mt-4">
               <h2 className="font-display text-2xl font-bold text-foreground mb-6">
                 Nearby Bars
               </h2>
