@@ -11,7 +11,7 @@ interface BarCardProps {
   latitude: number;
   longitude: number;
   address?: string;
-  openingHours?: string;
+  opening_hours?: string;
   website?: string;
   phone?: string;
   isNearest?: boolean;
@@ -26,7 +26,7 @@ const BarCard = ({
   latitude, 
   longitude,
   address,
-  openingHours,
+  opening_hours,
   phone,
   isNearest = false, 
   delay = 0 
@@ -42,18 +42,20 @@ const BarCard = ({
     window.open(mapsUrl, '_blank');
   };
 
-  // Get a quick info snippet
+  // Get a quick info snippet (exclude type to avoid duplication)
   const getQuickInfo = () => {
-    if (openingHours) return openingHours;
+    if (opening_hours) return opening_hours;
     if (phone) return phone;
     if (address) return address.split(',')[0];
-    return type;
+    return null;
   };
+
+  const quickInfo = getQuickInfo();
 
   return (
     <div 
       className={cn(
-        "glass-card rounded-2xl p-5 transition-all duration-500 hover:scale-[1.02] animate-count relative",
+        "glass-card rounded-2xl p-5 transition-all duration-500 hover:scale-[1.02] animate-fade-in relative",
         isNearest && "gradient-border neon-glow"
       )}
       style={{ animationDelay: `${delay}ms` }}
@@ -78,8 +80,12 @@ const BarCard = ({
           <div className="flex items-center gap-2 text-muted-foreground text-xs">
             <Beer className="h-3 w-3" />
             <span>{type}</span>
-            <span className="text-border">•</span>
-            <span className="truncate max-w-[150px]">{getQuickInfo()}</span>
+            {quickInfo && (
+              <>
+                <span className="text-border">•</span>
+                <span className="truncate max-w-[150px]">{quickInfo}</span>
+              </>
+            )}
           </div>
         </div>
         {rating && (
@@ -162,14 +168,14 @@ const BarCard = ({
               </div>
             )}
             
-            {openingHours && (
+            {opening_hours && (
               <div className="flex items-start gap-2">
                 <span className="text-muted-foreground text-xs w-14">Hours</span>
-                <span className="text-foreground flex-1 text-sm">{openingHours}</span>
+                <span className="text-foreground flex-1 text-sm">{opening_hours}</span>
               </div>
             )}
             
-            {!phone && !address && !openingHours && (
+            {!phone && !address && !opening_hours && (
               <p className="text-muted-foreground text-sm">No additional info available</p>
             )}
           </div>
