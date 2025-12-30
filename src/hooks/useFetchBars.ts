@@ -37,15 +37,11 @@ export const useFetchBars = () => {
         throw new Error(data.error);
       }
 
-      // Log for debugging
-      console.log('API response bars:', data.bars?.slice(0, 3));
-
       const barsWithId = data.bars.map((bar: Omit<Bar, 'id'> & { osm_id?: number }, index: number) => ({
         ...bar,
         id: bar.osm_id?.toString() || `bar-${index}`,
       }));
 
-      console.log('Bars with phone:', barsWithId.filter((b: Bar) => b.phone).length);
       setBars(barsWithId);
       return barsWithId;
     } catch (err) {

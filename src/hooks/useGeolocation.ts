@@ -23,7 +23,27 @@ export const useGeolocation = () => {
     isLoading: false,
   });
 
-  // Don't auto-load saved location - wait for user action
+  // Load saved location on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(LOCATION_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed: SavedLocation = JSON.parse(saved);
+        // Use saved location if less than 24 hours old
+        const isRecent = Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000;
+        if (isRecent) {
+          setState({
+            latitude: parsed.latitude,
+            longitude: parsed.longitude,
+            error: null,
+            isLoading: false,
+          });
+        }
+      } catch {
+        localStorage.removeItem(LOCATION_STORAGE_KEY);
+      }
+    }
+  }, []);
 
   const saveLocation = useCallback((latitude: number, longitude: number) => {
     const data: SavedLocation = {
