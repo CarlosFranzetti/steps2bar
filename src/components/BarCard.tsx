@@ -1,26 +1,55 @@
-import { Beer, MapPin, Footprints, Star } from "lucide-react";
+import { useState } from "react";
+import { Beer, Footprints, Star, Info, MapPin, X, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface BarCardProps {
   name: string;
-  distance: number; // in meters
+  distance: number;
   rating?: number;
   type: string;
+  latitude: number;
+  longitude: number;
+  address?: string;
+  openingHours?: string;
+  website?: string;
+  phone?: string;
   isNearest?: boolean;
   delay?: number;
 }
 
-const BarCard = ({ name, distance, rating, type, isNearest = false, delay = 0 }: BarCardProps) => {
+const BarCard = ({ 
+  name, 
+  distance, 
+  rating, 
+  type, 
+  latitude, 
+  longitude,
+  address,
+  openingHours,
+  website,
+  phone,
+  isNearest = false, 
+  delay = 0 
+}: BarCardProps) => {
+  const [showInfo, setShowInfo] = useState(false);
+  
   // Average stride length is about 0.762 meters
   const footsteps = Math.round(distance / 0.762);
   
   // Walking time estimate (average 1.4 m/s walking speed)
   const walkingMinutes = Math.round(distance / 84);
 
+  const openInMaps = () => {
+    // Universal link that works on iOS, Android, and desktop
+    const mapsUrl = `https://maps.google.com/maps?daddr=${latitude},${longitude}`;
+    window.open(mapsUrl, '_blank');
+  };
+
   return (
     <div 
       className={cn(
-        "glass-card rounded-2xl p-6 transition-all duration-500 hover:scale-[1.02] animate-count",
+        "glass-card rounded-2xl p-6 transition-all duration-500 hover:scale-[1.02] animate-count relative",
         isNearest && "gradient-border neon-glow"
       )}
       style={{ animationDelay: `${delay}ms` }}
@@ -35,9 +64,9 @@ const BarCard = ({ name, distance, rating, type, isNearest = false, delay = 0 }:
       )}
       
       <div className="flex items-start justify-between mb-4">
-        <div>
+        <div className="flex-1 cursor-pointer" onClick={openInMaps}>
           <h3 className={cn(
-            "font-display font-bold text-foreground mb-1",
+            "font-display font-bold text-foreground mb-1 hover:text-primary transition-colors",
             isNearest ? "text-2xl" : "text-xl"
           )}>
             {name}
@@ -76,13 +105,93 @@ const BarCard = ({ name, distance, rating, type, isNearest = false, delay = 0 }:
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <MapPin className="h-4 w-4" />
-          <span>{distance}m</span>
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">~{walkingMinutes} min walk</span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2"
+            onClick={() => setShowInfo(!showInfo)}
+          >
+            <Info className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2"
+            onClick={openInMaps}
+          >
+            <MapPin className="h-4 w-4" />
+          </Button>
         </div>
-        <span>~{walkingMinutes} min walk</span>
       </div>
+
+      {/* Quick Info Panel */}
+      {showInfo && (
+        <div className="absolute inset-0 bg-card/95 backdrop-blur-sm rounded-2xl p-6 z-10 animate-fade-in">
+          <div className="flex items-start justify-between mb-4">
+            <h4 className="font-display font-bold text-lg text-foreground">{name}</h4>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 -mr-2 -mt-2"
+              onClick={() => setShowInfo(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="space-y-3 text-sm">
+            <div className="flex items-start gap-2">
+              <Beer className="h-4 w-4 text-muted-foreground mt-0.5" />
+              <span className="text-muted-foreground">{type}</span>
+            </div>
+            
+            {address && (
+              <div className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <span className="text-muted-foreground">{address}</span>
+              </div>
+            )}
+            
+            {openingHours && (
+              <div className="flex items-start gap-2">
+                <span className="text-muted-foreground">🕐</span>
+                <span className="text-muted-foreground">{openingHours}</span>
+              </div>
+            )}
+            
+            {phone && (
+              <div className="flex items-start gap-2">
+                <span className="text-muted-foreground">📞</span>
+                <a href={`tel:${phone}`} className="text-primary hover:underline">{phone}</a>
+              </div>
+            )}
+            
+            {website && (
+              <div className="flex items-start gap-2">
+                <ExternalLink className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <a 
+                  href={website.startsWith('http') ? website : `https://${website}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline truncate"
+                >
+                  {website.replace(/^https?:\/\//, '')}
+                </a>
+              </div>
+            )}
+            
+            <div className="pt-3 border-t border-border/50">
+              <Button onClick={openInMaps} variant="default" size="sm" className="w-full">
+                <MapPin className="h-4 w-4 mr-2" />
+                Open in Maps
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

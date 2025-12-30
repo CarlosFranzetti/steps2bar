@@ -1,16 +1,21 @@
 import { useState, useEffect, useRef } from "react";
-import { Beer, AlertCircle } from "lucide-react";
+import { Beer, AlertCircle, ChevronDown } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { useFetchBars } from "@/hooks/useFetchBars";
+import { useFetchBars, Bar } from "@/hooks/useFetchBars";
 import BarCard from "@/components/BarCard";
 import FootstepCounter from "@/components/FootstepCounter";
 import LocationButton from "@/components/LocationButton";
+import LocationInput from "@/components/LocationInput";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
+const BARS_PER_PAGE = 20;
+
 const Index = () => {
-  const { latitude, longitude, error: geoError, isLoading: geoLoading, getLocation } = useGeolocation();
+  const { latitude, longitude, error: geoError, isLoading: geoLoading, getLocation, setManualLocation } = useGeolocation();
   const { bars, isLoading: barsLoading, error: barsError, fetchBars } = useFetchBars();
   const [showBars, setShowBars] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(BARS_PER_PAGE);
   const { toast } = useToast();
   const hasFetchedRef = useRef(false);
 
@@ -19,11 +24,23 @@ const Index = () => {
   const isLoading = geoLoading || barsLoading;
   const error = geoError || barsError;
 
-  // Fetch bars when location is available (either saved or fresh)
+  const visibleBars = bars.slice(0, visibleCount);
+  const hasMoreBars = visibleCount < bars.length;
+
+  const handleManualLocation = (lat: number, lng: number) => {
+    setManualLocation(lat, lng);
+  };
+
+  const loadMoreBars = () => {
+    setVisibleCount((prev) => Math.min(prev + BARS_PER_PAGE, bars.length));
+  };
+
+  // Fetch bars when location is available
   useEffect(() => {
     if (hasLocation && latitude && longitude && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
-      fetchBars(latitude, longitude).then((fetchedBars) => {
+      setVisibleCount(BARS_PER_PAGE);
+      fetchBars(latitude, longitude).then((fetchedBars: Bar[]) => {
         if (fetchedBars.length > 0) {
           setShowBars(true);
           toast({
@@ -46,6 +63,7 @@ const Index = () => {
     if (!hasLocation) {
       hasFetchedRef.current = false;
       setShowBars(false);
+      setVisibleCount(BARS_PER_PAGE);
     }
   }, [hasLocation]);
 
@@ -80,12 +98,25 @@ const Index = () => {
 
         {/* Main content */}
         <div className="max-w-2xl mx-auto">
-          {/* Location button */}
-          <div className="text-center mb-8">
-            <LocationButton
-              onClick={getLocation}
+          {/* Location controls */}
+          <div className="space-y-4 mb-8">
+            <div className="text-center">
+              <LocationButton
+                onClick={getLocation}
+                isLoading={isLoading}
+                hasLocation={hasLocation}
+              />
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">or</span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+            
+            <LocationInput 
+              onLocationFound={handleManualLocation}
               isLoading={isLoading}
-              hasLocation={hasLocation}
             />
           </div>
 
@@ -111,16 +142,36 @@ const Index = () => {
               <h2 className="font-display text-2xl font-bold text-foreground mb-6">
                 Nearby Bars
               </h2>
-              {bars.map((bar, index) => (
+              {visibleBars.map((bar, index) => (
                 <BarCard
                   key={bar.id}
                   name={bar.name}
                   distance={bar.distance}
                   type={bar.type}
+                  latitude={bar.latitude}
+                  longitude={bar.longitude}
+                  address={bar.address}
+                  openingHours={bar.opening_hours}
+                  website={bar.website}
+                  phone={bar.phone}
                   isNearest={index === 0}
                   delay={index * 100}
                 />
               ))}
+              
+              {hasMoreBars && (
+                <div className="text-center pt-4">
+                  <Button
+                    variant="glass"
+                    size="lg"
+                    onClick={loadMoreBars}
+                    className="gap-2"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                    More Bars ({bars.length - visibleCount} remaining)
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
@@ -130,7 +181,7 @@ const Index = () => {
               <div className="glass-card rounded-2xl p-8 max-w-sm mx-auto">
                 <Beer className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  Tap the button above to discover how many footsteps stand between you and refreshment.
+                  Tap the button above or enter an address to discover how many footsteps stand between you and refreshment.
                 </p>
               </div>
             </div>
