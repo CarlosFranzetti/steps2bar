@@ -79,29 +79,29 @@ const Index = () => {
       {/* Background gradient - dark brown fade */}
       <div className="fixed inset-0 bg-gradient-to-b from-[hsl(20,30%,8%)] via-background to-background pointer-events-none" />
       
-      <div className="container relative z-10 py-16 px-4 sm:px-6">
+      <div className="container relative z-10 py-12 px-4">
         {/* Header */}
-        <header className="text-center mb-8">
+        <header className="text-center">
           <div 
-            className="inline-flex items-center justify-center gap-2.5 cursor-pointer"
+            className="inline-flex items-center justify-center gap-3 mb-3 cursor-pointer"
             onClick={() => setShowTagline(true)}
           >
-            <Beer className="h-8 w-8 text-primary animate-float" />
-            <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+            <Beer className="h-10 w-10 text-primary animate-float" />
+            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground">
               Steps<span className="text-primary">2</span>Bar
             </h1>
           </div>
-          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-16 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}>
-            <p className="text-base text-muted-foreground max-w-sm mx-auto leading-relaxed">
-              Know exactly how many footsteps to your next drink.
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-20 opacity-100 mb-3' : 'max-h-0 opacity-0 mb-0'}`}>
+            <p className="text-lg text-muted-foreground max-w-md mx-auto">
+              Because knowing the exact number of footsteps to your next drink is essential information.
             </p>
           </div>
         </header>
 
         {/* Main content */}
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-2xl mx-auto">
           {/* Location controls */}
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-3 mb-4">
             <LocationButton
               onClick={() => {
                 setShowTagline(false);
@@ -111,7 +111,7 @@ const Index = () => {
               hasLocation={hasLocation}
             />
             
-            <div className="w-full">
+            <div className="w-full max-w-md">
               <LocationInput
                 onLocationFound={(lat, lng) => {
                   setShowTagline(false);
