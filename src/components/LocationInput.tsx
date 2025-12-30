@@ -61,7 +61,7 @@ const LocationInput = ({ onLocationFound, isLoading }: LocationInputProps) => {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="pl-10 bg-card/60 border-border/50"
+            className="pl-10 pr-4 bg-card/60 border-border/50"
             disabled={isLoading || searching}
           />
         </div>

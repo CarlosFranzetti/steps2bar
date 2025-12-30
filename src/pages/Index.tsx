@@ -16,6 +16,7 @@ const Index = () => {
   const { bars, isLoading: barsLoading, error: barsError, fetchBars } = useFetchBars();
   const [showBars, setShowBars] = useState(false);
   const [visibleCount, setVisibleCount] = useState(BARS_PER_PAGE);
+  const [showTagline, setShowTagline] = useState(true);
   const { toast } = useToast();
   const hasFetchedRef = useRef(false);
 
@@ -84,16 +85,21 @@ const Index = () => {
       
       <div className="container relative z-10 py-12 px-4">
         {/* Header */}
-        <header className="text-center mb-12">
-          <div className="inline-flex items-center justify-center gap-3 mb-6">
+        <header className={`text-center ${showTagline ? 'mb-12' : 'mb-8'}`}>
+          <div 
+            className="inline-flex items-center justify-center gap-3 mb-4 cursor-pointer"
+            onClick={() => setShowTagline(true)}
+          >
             <Beer className="h-10 w-10 text-primary animate-float" />
             <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground">
               Steps<span className="text-primary">2</span>Bar
             </h1>
           </div>
-          <p className="text-lg text-muted-foreground max-w-md mx-auto">
-            Because knowing the exact number of footsteps to your next drink is essential information.
-          </p>
+          {showTagline && (
+            <p className="text-lg text-muted-foreground max-w-md mx-auto">
+              Because knowing the exact number of footsteps to your next drink is essential information.
+            </p>
+          )}
         </header>
 
         {/* Main content */}
@@ -102,20 +108,20 @@ const Index = () => {
           <div className="space-y-4 mb-8">
             <div className="text-center">
               <LocationButton
-                onClick={getLocation}
+                onClick={() => {
+                  setShowTagline(false);
+                  getLocation();
+                }}
                 isLoading={isLoading}
                 hasLocation={hasLocation}
               />
             </div>
             
-            <div className="flex items-center gap-4">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">or</span>
-              <div className="flex-1 h-px bg-border" />
-            </div>
-            
-            <LocationInput 
-              onLocationFound={handleManualLocation}
+            <LocationInput
+              onLocationFound={(lat, lng) => {
+                setShowTagline(false);
+                handleManualLocation(lat, lng);
+              }}
               isLoading={isLoading}
             />
           </div>
