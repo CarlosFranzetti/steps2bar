@@ -8,8 +8,7 @@ import LocationButton from "@/components/LocationButton";
 import LocationInput from "@/components/LocationInput";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-
-const BARS_PER_PAGE = 10;
+const BARS_PER_PAGE = 5;
 
 const Index = () => {
   const { latitude, longitude, error: geoError, isLoading: geoLoading, getLocation, setManualLocation } = useGeolocation();
@@ -41,13 +40,10 @@ const Index = () => {
     if (hasLocation && latitude && longitude && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       setVisibleCount(BARS_PER_PAGE);
+      setShowTagline(false);
       fetchBars(latitude, longitude).then((fetchedBars: Bar[]) => {
         if (fetchedBars.length > 0) {
           setShowBars(true);
-          toast({
-            title: "Location found!",
-            description: `Found ${fetchedBars.length} bars near you.`,
-          });
         } else {
           toast({
             title: "No bars found",
@@ -83,52 +79,52 @@ const Index = () => {
       {/* Background gradient - dark brown fade */}
       <div className="fixed inset-0 bg-gradient-to-b from-[hsl(20,30%,8%)] via-background to-background pointer-events-none" />
       
-      <div className="container relative z-10 py-12 px-4">
+      <div className="container relative z-10 py-16 px-4 sm:px-6">
         {/* Header */}
-        <header className="text-center">
+        <header className="text-center mb-8">
           <div 
-            className="inline-flex items-center justify-center gap-3 mb-3 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2.5 cursor-pointer"
             onClick={() => setShowTagline(true)}
           >
-            <Beer className="h-10 w-10 text-primary animate-float" />
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground">
+            <Beer className="h-8 w-8 text-primary animate-float" />
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Steps<span className="text-primary">2</span>Bar
             </h1>
           </div>
-          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-20 opacity-100 mb-6' : 'max-h-0 opacity-0 mb-0'}`}>
-            <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              Because knowing the exact number of footsteps to your next drink is essential information.
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-16 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}>
+            <p className="text-base text-muted-foreground max-w-sm mx-auto leading-relaxed">
+              Know exactly how many footsteps to your next drink.
             </p>
           </div>
         </header>
 
         {/* Main content */}
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-lg mx-auto">
           {/* Location controls */}
-          <div className="space-y-4 mb-8">
-            <div className="text-center">
-              <LocationButton
-                onClick={() => {
-                  setShowTagline(false);
-                  getLocation();
-                }}
-                isLoading={isLoading}
-                hasLocation={hasLocation}
-              />
-            </div>
-            
-            <LocationInput
-              onLocationFound={(lat, lng) => {
+          <div className="flex flex-col items-center gap-4">
+            <LocationButton
+              onClick={() => {
                 setShowTagline(false);
-                handleManualLocation(lat, lng);
+                getLocation();
               }}
               isLoading={isLoading}
+              hasLocation={hasLocation}
             />
+            
+            <div className="w-full">
+              <LocationInput
+                onLocationFound={(lat, lng) => {
+                  setShowTagline(false);
+                  handleManualLocation(lat, lng);
+                }}
+                isLoading={isLoading}
+              />
+            </div>
           </div>
 
           {/* Error display */}
           {error && (
-            <div className="glass-card rounded-xl p-4 mb-8 flex items-center gap-3 border-destructive/50">
+            <div className="glass-card rounded-xl p-4 mb-4 flex items-center gap-3 border-destructive/50">
               <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
               <p className="text-sm text-muted-foreground">{error}</p>
             </div>
@@ -144,7 +140,7 @@ const Index = () => {
 
           {/* Bar list */}
           {showBars && bars.length > 0 && (
-            <div className="space-y-4 mt-8">
+            <div className="space-y-4 mt-4">
               <h2 className="font-display text-2xl font-bold text-foreground mb-6">
                 Nearby Bars
               </h2>
@@ -157,11 +153,8 @@ const Index = () => {
                   latitude={bar.latitude}
                   longitude={bar.longitude}
                   address={bar.address}
-                  openingHours={bar.opening_hours}
-                  website={bar.website}
-                  phone={bar.phone}
                   isNearest={index === 0}
-                  delay={index * 100}
+                  delay={index * 50}
                 />
               ))}
               
@@ -180,6 +173,7 @@ const Index = () => {
               )}
             </div>
           )}
+
 
           {/* Empty state */}
           {!showBars && !isLoading && (
