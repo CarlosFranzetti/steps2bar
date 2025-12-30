@@ -15,12 +15,6 @@ interface OSMElement {
   tags?: {
     name?: string;
     amenity?: string;
-    addr_street?: string;
-    addr_housenumber?: string;
-    addr_city?: string;
-    opening_hours?: string;
-    website?: string;
-    phone?: string;
     [key: string]: string | undefined;
   };
 }
@@ -130,17 +124,38 @@ serve(async (req) => {
           const lon = el.lon ?? el.center?.lon;
           const distance = calculateDistance(latitude, longitude, lat!, lon!);
 
+          const tags = el.tags ?? {};
+          const getTag = (...keys: string[]) => keys.map((k) => tags[k]).find(Boolean) ?? null;
+
+          const fullAddr = getTag('addr:full');
+          const house = getTag('addr:housenumber');
+          const street = getTag('addr:street');
+          const city = getTag('addr:city');
+          const state = getTag('addr:state');
+          const postcode = getTag('addr:postcode');
+
+          const address =
+            fullAddr ||
+            [
+              [house, street].filter(Boolean).join(' '),
+              city,
+              state,
+              postcode,
+            ]
+              .filter(Boolean)
+              .join(', ') ||
+            null;
+
           return {
             osm_id: el.id,
-            name: el.tags!.name!,
-            type: typeMap[el.tags!.amenity || 'bar'] || 'Bar',
+            name: tags.name!,
+            type: typeMap[tags.amenity || 'bar'] || 'Bar',
             latitude: lat,
             longitude: lon,
-            address: [el.tags?.addr_housenumber, el.tags?.addr_street, el.tags?.addr_city]
-              .filter(Boolean).join(', ') || null,
-            opening_hours: el.tags?.opening_hours || null,
-            website: el.tags?.website || null,
-            phone: el.tags?.phone || null,
+            address,
+            opening_hours: getTag('opening_hours'),
+            website: getTag('website', 'contact:website'),
+            phone: getTag('phone', 'contact:phone', 'phone:mobile'),
             distance,
           };
         });
@@ -151,7 +166,7 @@ serve(async (req) => {
         
         const { error: upsertError } = await supabase
           .from('bars')
-          .upsert(barsToStore, { onConflict: 'osm_id', ignoreDuplicates: true });
+          .upsert(barsToStore, { onConflict: 'osm_id' });
 
         if (upsertError) {
           console.error('Error storing bars:', upsertError);

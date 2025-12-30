@@ -9,7 +9,7 @@ import LocationInput from "@/components/LocationInput";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-const BARS_PER_PAGE = 10;
+const BARS_PER_PAGE = 7;
 
 const Index = () => {
   const { latitude, longitude, error: geoError, isLoading: geoLoading, getLocation, setManualLocation } = useGeolocation();
@@ -92,7 +92,7 @@ const Index = () => {
               Steps<span className="text-primary">2</span>Bar
             </h1>
           </div>
-          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-20 opacity-100 mb-6' : 'max-h-0 opacity-0 mb-0'}`}>
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${showTagline ? 'max-h-20 opacity-100 mb-4' : 'max-h-0 opacity-0 mb-0'}`}>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
               Because knowing the exact number of footsteps to your next drink is essential information.
             </p>
@@ -102,8 +102,8 @@ const Index = () => {
         {/* Main content */}
         <div className="max-w-2xl mx-auto">
           {/* Location controls */}
-          <div className="space-y-3 mb-4">
-            <div className="text-center">
+          <div className="space-y-2 mb-4">
+            <div className={`text-center ${showTagline ? '-mt-1' : ''}`}>
               <LocationButton
                 onClick={() => {
                   setShowTagline(false);
