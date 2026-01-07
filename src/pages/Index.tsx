@@ -105,6 +105,7 @@ const Index = () => {
             <LocationButton
               onClick={() => {
                 setShowTagline(false);
+                hasFetchedRef.current = false; // Allow re-fetch on location update
                 getLocation();
               }}
               isLoading={isLoading}
@@ -115,9 +116,13 @@ const Index = () => {
               <LocationInput
                 onLocationFound={(lat, lng) => {
                   setShowTagline(false);
+                  hasFetchedRef.current = false; // Allow re-fetch
                   handleManualLocation(lat, lng);
                 }}
                 isLoading={isLoading}
+                onRequestGeolocation={() => {
+                  hasFetchedRef.current = false;
+                }}
               />
             </div>
           </div>
