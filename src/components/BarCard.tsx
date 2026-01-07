@@ -31,7 +31,7 @@ const BarCard = ({
   const openInMaps = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     const mapsUrl = `https://maps.google.com/maps?daddr=${latitude},${longitude}`;
-    window.open(mapsUrl, '_blank');
+    window.open(mapsUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
