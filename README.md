@@ -43,34 +43,7 @@ You need an app if you want:
 ✅ **Faster justification**  
 ✅ **A tiny nudge that makes leaving easier than staying home**  
   
-We're not here to gamify your life. We're here to unstick your Wednesday night.
-
-## Features
-
-🎯 **Location-based bar discovery** - Find what's actually nearby  
-📏 **Real-time distance calculation** - In steps, because why not  
-🚀 **Zero decision paralysis** - Less overthinking, more walking  
-💡 **Low-regret moves** - We're solving commitment anxiety, not navigation  
-
-## Tech Stack
-
-Built with the good stuff:  
-
-- **React** - Because components > chaos  
-- **TypeScript** - Fewer lies in our code  
-- **Vite** - Fast builds for fast decisions  
-- **Tailwind CSS** - Looking good while overthinking  
-- **shadcn-ui** - Beautiful components, zero drama
-
-## Getting Started
-
-```sh
-# Install dependencies
-npm i
-
-# Start making bad decisions (efficiently)
-npm run dev
-```
+Made for people who want to go out but need a gentle push.  No tracking overload.  No gamification BS. Just you, a number, and a decision. 
 
 ## The Real Value Proposition
 
@@ -90,21 +63,13 @@ Think of us as a **permission engine** disguised as a distance calculator.
 
 *"Because drunk humans love novelty.  Especially novelty that tells them they're only 800 steps away from joy."* 🍺
 
-## Development
-
-Local development is simple:
-
-```sh
-npm i
-npm run dev
-```
-
-## Deployment
-
-Deploy when you're ready.  Or don't. We're not here to pressure you.
-
 ---
 
-Made for people who want to go out but need a gentle push.  No tracking overload.  No gamification BS. Just you, a number, and a decision. 
+## Features
+
+🎯 **Location-based bar discovery** - Find what's actually nearby  
+📏 **Real-time distance calculation** - In steps, because why not  
+🚀 **Zero decision paralysis** - Less overthinking, more walking  
+💡 **Low-regret moves** - We're solving commitment anxiety, not navigation  
 
 **Now stop reading and go walk somewhere.** 🚶‍♀️
